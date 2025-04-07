@@ -1,7 +1,7 @@
 #include "graphics.h"
 
 Box::Box(sf::Vector2f pos, int width, int height, int line_width)
-	: points(sf::PrimitiveType::TriangleStrip, 10)
+	: pos(pos), height(height), width(width), line_width(line_width), points(sf::PrimitiveType::TriangleStrip, 10)
 {
 	// Outer box
 	points[0].position = pos;

@@ -1,9 +1,10 @@
 #pragma once
-
-#include <SFML/Graphics.hpp>;
+#include <SFML/Graphics.hpp>
 
 class Box : public sf::Drawable {
 public:
+	sf::Vector2f pos;
+	int width, height, line_width;
 	Box(sf::Vector2f pos, int height, int width, int line_width);
 	void setColor(sf::Color color);
 	
