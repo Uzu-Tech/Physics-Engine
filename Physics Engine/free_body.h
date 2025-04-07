@@ -17,10 +17,12 @@ public:
 	void update(float delta_time);
 	void applyForce(sf::Vector2f force);
 
+	float getRadius() const { return circle.getRadius(); };
+
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-		target.draw(shape, states);
+		target.draw(circle, states);
 	}
 
-	sf::CircleShape shape;
+	sf::CircleShape circle;
 };
