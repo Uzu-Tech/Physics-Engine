@@ -1,6 +1,6 @@
 # Building a 2D Physics Engine in C++ with SFML
 
-In this project, I’m setting out to create a 2D physics engine that can simulate a variety of physical phenomena like kinematics, springs, collisions, electrostatic forces, and more. I’m using **C++17** for the code, **SFML 2.6** for rendering, and **Visual Studio** as my IDE.
+In this project, I’m set out to create a 2D physics engine that can simulate a variety of physical phenomena like kinematics, springs, collisions, electrostatic forces, and more. I’m using **C++17** for the code, **SFML 2.6** for rendering, and **Visual Studio** as my IDE.
 
 ## Simple Mechanics - Ball in a Box
 
