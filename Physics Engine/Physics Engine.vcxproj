@@ -103,7 +103,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\DELL\OneDrive - Brighton College Abu Dhabi\Documents\C++ Libraries\SFML-3.0.0-windows-vc17-32-bit\SFML-3.0.0\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);sfml-system.lib;sfml-graphics.lib;sfml-windowlib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);sfml-system.lib;sfml-graphics.lib;sfml-window.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="collison.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="main.cpp">
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp20</LanguageStandard>
@@ -150,6 +151,7 @@
     <ClCompile Include="free_body.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="collison.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="free_body.h" />
     <ClInclude Include="config.h" />

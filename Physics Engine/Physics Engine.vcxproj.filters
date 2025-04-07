@@ -24,6 +24,9 @@
     <ClCompile Include="free_body.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="collison.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics.h">
@@ -33,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="free_body.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="collison.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
