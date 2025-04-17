@@ -28,3 +28,22 @@ void Box::setColor(sf::Color color)
 		points[i].color = color;
 	}
 }
+
+std::string round_to_string(double num, int decimal_places)
+{
+	double factor{ std::pow(10.0f, decimal_places) };
+	int scaled_num{ static_cast<int>(std::floor(factor * num)) };
+	
+	int int_part{ scaled_num / static_cast<int>(factor) };
+	int frac_part{ scaled_num % static_cast<int>(factor) };
+
+	return std::to_string(int_part) + "." + std::to_string(frac_part);
+}
+
+sf::CircleShape getArrow(float inital_size, sf::Color color)
+{
+	sf::CircleShape arrow(inital_size, 3);
+	arrow.setFillColor(color);
+	return arrow;
+}
+
