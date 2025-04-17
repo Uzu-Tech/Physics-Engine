@@ -3,6 +3,8 @@
 #include "config.h"
 #include "free_body.h"
 #include "collison.h"
+#include "events.h"
+#include "engine.h"
 
 int main()
 {
@@ -11,33 +13,59 @@ int main()
     );
     window.setVerticalSyncEnabled(true);
 
-    sf::Vector2f box_pos(Config::BOX_BUFFER, Config::BOX_BUFFER);
-    constexpr int BOX_WIDTH = Config::SCREEN_WIDTH - 2 * Config::BOX_BUFFER;
-    constexpr int BOX_HEIGHT = Config::SCREEN_HEIGHT - 2 * Config::BOX_BUFFER;
+    // A box that encloses the balls used for collisons
+    Box box{ createBox() };
 
-    Box box(box_pos, BOX_WIDTH, BOX_HEIGHT, Config::BOX_LINE_WIDTH);
-    box.setColor(Config::WHITE);
+    FreeBodyConfig free_body_config;
+    // Balls that experince the physical forces & can collide with other objects
+    std::vector<FreeBody> balls{ generate_random_free_bodies(Config::NUM_FREE_BODIES, box, free_body_config) };
+    balls.emplace_back(100.0f, Config::CENTER);
 
-    FreeBody ball(Config::TEST_MASS, Config::INITIAL_POSITION, Config::INITIAL_VELOCITY, Config::RESTITUTION);
 
+    sf::Font font(Config::FONT_FILE);
+    sf::Text energy_text{ createText(font, Config::TEXT_POS, Config::TEXT_SIZE) };
+
+    double last_energy_value{};
+    double energy_derivative{};
+
+    // Timing variables
     sf::Clock clock;
-    sf::Vector2f GRAVITY(0.0f, 981.0f);
+    double accumulator{ 0.0f };
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
+            {
                 window.close();
+            }
         }
 
-        ball.applyForce(ball.mass * GRAVITY);
-        handleBoxCollison(box, ball);
-        float deltaTime = clock.restart().asSeconds();
-        ball.update(deltaTime);
+        // Update based on discrete time step in seconds
+        double elaspedTime{ static_cast<double>(clock.restart().asSeconds()) };
+        accumulator += elaspedTime;
+           
+        updateFreeBodies(balls, box, accumulator, elaspedTime);
 
         window.clear(Config::BG_COLOR);
         window.draw(box);
-        window.draw(ball);
+
+        /// TODO put in seperate function and calculate long-run energy loss
+        double total_energy{ getKineticEnergy(balls) };
+        
+        if (last_energy_value) {
+            double new_energy_derivative = (total_energy - last_energy_value) / elaspedTime;
+            energy_derivative = updatedEnergyDerivative(new_energy_derivative);
+        }
+        last_energy_value = total_energy;
+
+        for (const FreeBody& ball : balls) 
+        {
+            window.draw(ball);
+        }
+
+        energy_text.setString(Config::KE_TEXT + std::to_string(energy_derivative));
+        window.draw(energy_text);
         window.display();
     }
 }
