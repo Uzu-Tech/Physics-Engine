@@ -50,3 +50,34 @@ void FreeBody::applyForce(sf::Vector2f force)
 And with that we can finally get our ball to move.
 
 <img src="https://github.com/user-attachments/assets/cdbdd892-0368-4ffe-9b8e-d917f4591c24" width="400"/>
+
+### Dealing with Collisons
+
+To prevent our ball from phasing through the floor let's add a simple collison detection system to detect when the ball hits the box's bottom or sides. To keep things simple let's assume the collison is elastic so the ball's kinetic energy is the same before and after. When we detect the ball is outside the box we can first resolve the collison by moving the ball back into the box and then flipping either its horizontal or vertical velocity depending on whether it hits the side, floor or ceiling.
+
+```cpp
+void handleBoxCollison(Box& box, FreeBody& free_body)
+{
+	// Get the positions of the floor, ceiling and sides of the box from the box coordinates with ball radius included
+	float collison_ceiling{ box.pos.y + box.line_width + free_body.getRadius() };
+	float collison_floor{ box.pos.y - box.line_width + box.height - free_body.getRadius() };
+	float collison_left{ box.pos.x + box.line_width + free_body.getRadius() };
+	float collison_right{ box.pos.x - box.line_width + box.width - free_body.getRadius() };
+
+	// Resolve ceiling or floor collison
+	if (free_body.position.y <= collison_ceiling || free_body.position.y >= collison_floor) {
+		free_body.velocity.y = -free_body.velocity.y;
+		free_body.position.y = (free_body.position.y <= collison_ceiling) ? collison_ceiling : collison_floor;
+	}
+	
+	// Resolve side collison
+	if (free_body.position.x <= collison_left || free_body.position.x >= collison_right) {
+		free_body.velocity.x = -free_body.velocity.x;
+		free_body.position.x = (free_body.position.x <= collison_left) ? collison_left : collison_right;
+	}
+}
+```
+
+Now we can finally get something that looks at least normal
+
+<img src="https://github.com/user-attachments/assets/9bdbbca1-88b7-4917-b803-3e2a51f82e94" width="400"/>
