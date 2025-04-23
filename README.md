@@ -80,4 +80,23 @@ void handleBoxCollison(Box& box, FreeBody& free_body)
 
 Now we can finally get something that looks at least normal
 
-<img src="https://github.com/user-attachments/assets/9bdbbca1-88b7-4917-b803-3e2a51f82e94" width="400"/>
+<img src="https://github.com/user-attachments/assets/6175a22f-f85c-4f9b-a37f-179e684a9a20" width="400"/>
+
+I also added an energy loss measure on top to see roughly the error rate of the model
+
+### Collisons with other free bodies
+
+If we want to add multiple balls we need with free bodies colliding with one another. Assuming all collisons are elastic, when two free bodies collide their total momentum and kinetic energy must be the same before the after the collison. Mathematically that's represented with these simultaneous equations:
+
+Momemtum:  
+$$m_1 u_1 + m_2 u_{2} = m_1 v_1 + m_2 v_2$$
+
+Energy:  
+$$\frac{1}{2} m_1 u_1^2 + \frac{1}{2} m_2 u_2^2 = \frac{1}{2} m_1 v_1^2 + \frac{1}{2} m_2 v_2^2$$
+
+Where $m_1$, $m_2$ are the masses of the free bodies, $u_1$, $u_2$ are the initial velcoities, and $v_1$, $v_2$ are the final velocities.
+Solving this equation (with a ton of alegbra) for $v_1$ and $v_2$ we get:
+
+$v_1 = \frac{m_1 - m_2}{m_1 + m_2}u_1 + \frac{2m_2}{m_1 + m_2}u_2$
+
+$v_2 = \frac{2m_1}{m_1 + m_2}u_1 + \frac{m_2 - m_1}{m_1 + m_2}u_2$
