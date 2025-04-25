@@ -86,17 +86,72 @@ I also added an energy loss measure on top to see roughly the error rate of the 
 
 ### Collisons with other free bodies
 
-If we want to add multiple balls we need with free bodies colliding with one another. Assuming all collisons are elastic, when two free bodies collide their total momentum and kinetic energy must be the same before the after the collison. Mathematically that's represented with these simultaneous equations:
+To support multiple balls colliding with each other, we need to implement elastic collisions between free bodies. In an elastic collision, **both momentum and kinetic energy are conserved**. In 1D, this is represented by the following equations:
 
-Momemtum:  
+**Momemtum**:  
 $$m_1 u_1 + m_2 u_{2} = m_1 v_1 + m_2 v_2$$
 
-Energy:  
+**Energy**:  
 $$\frac{1}{2} m_1 u_1^2 + \frac{1}{2} m_2 u_2^2 = \frac{1}{2} m_1 v_1^2 + \frac{1}{2} m_2 v_2^2$$
 
-Where $m_1$, $m_2$ are the masses of the free bodies, $u_1$, $u_2$ are the initial velcoities, and $v_1$, $v_2$ are the final velocities.
+Where:
+- $m_1$, $m_2$ are the masses of the free bodies
+- $u_1$, $u_2$ are the initial velcoities
+- $v_1$, $v_2$ are the final velocities.
+
 Solving this equation (with a ton of alegbra) for $v_1$ and $v_2$ we get:
 
 $v_1 = \frac{m_1 - m_2}{m_1 + m_2}u_1 + \frac{2m_2}{m_1 + m_2}u_2$
 
 $v_2 = \frac{2m_1}{m_1 + m_2}u_1 + \frac{m_2 - m_1}{m_1 + m_2}u_2$
+
+### Extending to 2D Collisions
+
+These equations only work in one dimension. For 2D collisions, we project the velocities onto two axes:
+- The normal axis (the direction of the collision).
+- The tangent axis (perpendicular to the collision).
+
+Velocities along the tangent axis remain unchanged—it's like two balls just brushing past each other. Only the normal components of the velocities need to be updated using the 1D formulas above. Here's the general idea in code using vector operations.
+
+```cpp
+void handleFreeBodyCollision(FreeBody& free_body1, FreeBody& free_body2) {
+	// Resolve overlap by shifting the first free body out of free body 2
+	float distance{ magnitude(free_body1.position - free_body2.position) };
+	float overlap{
+		free_body1.getRadius() + free_body2.getRadius() - distance
+	};
+	sf::Vector2f collision_normal{
+		(free_body1.position - free_body2.position) / distance
+	};
+	free_body1.position += overlap * collision_normal;
+
+	// Calculate new velocities based on conversation of momentum and kinetic energy along axis of collision
+	sf::Vector2f collision_tangent(-collision_normal.y, collision_normal.x);
+
+	// u represents the magnitude of intial velocity along the collison axis
+	float u1{ dot(free_body1.velocity, collision_normal) };
+	float u2{ dot(free_body2.velocity, collision_normal) };
+
+	// Factors used in equation
+	float mass_difference_factor{ (free_body1.mass - free_body2.mass) / (free_body1.mass + free_body2.mass) };
+	float partner_mass_factor1{ 2 * free_body2.mass / (free_body1.mass + free_body2.mass) };
+	float partner_mass_factor2{ 2 * free_body1.mass / (free_body1.mass + free_body2.mass) };
+
+	// v represents the final velocity along the collison axis
+	float v1{ mass_difference_factor * u1 + partner_mass_factor1 * u2 };
+	float v2{ -mass_difference_factor * u2 + partner_mass_factor2 * u1 };
+
+	sf::Vector2f v1_normal{ v1 * collision_normal };
+	sf::Vector2f v2_normal{ v2 * collision_normal };
+
+	sf::Vector2f v1_tangent{ dot(free_body1.velocity, collision_tangent) * collision_tangent };
+	sf::Vector2f v2_tangent{ dot(free_body2.velocity, collision_tangent) * collision_tangent };
+
+	free_body1.velocity = v1_normal + v1_tangent;
+	free_body2.velocity = v2_normal + v2_tangent;
+}
+```
+
+Here's the result for 5 balls:
+
+<img src="https://github.com/user-attachments/assets/0dbba392-51cd-4447-a158-02b1d1cd0cfa" width="400"/>
