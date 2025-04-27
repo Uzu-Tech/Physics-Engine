@@ -19,7 +19,6 @@ int main()
     FreeBodyConfig free_body_config;
     // Balls that experince the physical forces & can collide with other objects
     std::vector<FreeBody> balls{ generate_random_free_bodies(Config::NUM_FREE_BODIES, box, free_body_config) };
-    balls.emplace_back(100.0f, Config::CENTER);
 
 
     sf::Font font(Config::FONT_FILE);
@@ -51,7 +50,7 @@ int main()
         window.draw(box);
 
         /// TODO put in seperate function and calculate long-run energy loss
-        double total_energy{ getKineticEnergy(balls) };
+        double total_energy{ getTotalEnergy(balls, box) };
         
         if (last_energy_value) {
             double new_energy_derivative = (total_energy - last_energy_value) / elaspedTime;
