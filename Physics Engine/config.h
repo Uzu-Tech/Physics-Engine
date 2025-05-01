@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <filesystem>
-#include <string_view>
+#include <string>
 
 namespace Config {
 	// Grpahics
