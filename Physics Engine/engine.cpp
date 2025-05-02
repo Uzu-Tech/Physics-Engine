@@ -14,26 +14,26 @@ Box createBox()
 
 std::vector<FreeBody> generate_random_free_bodies(long num_free_bodies, Box& box, const FreeBodyConfig& config)
 {
-	static constexpr float PI = 3.14159;
+	static constexpr double PI{ 3.14159 };
 	std::random_device rd; 
 	std::mt19937 gen(rd()); // seed the generator
 
 	sf::Vector2f top_left_corner{ box.pos + sf::Vector2f(box.line_width, box.line_width) };
 	std::uniform_real_distribution<> dist_real(0.0, 1.0);
 
-	float inner_width = static_cast<float>(box.width - 2 * box.line_width);
-	float inner_height = static_cast<float>(box.height - 2 * box.line_width);
+	double inner_width = static_cast<double>(box.width - 2 * box.line_width);
+	double inner_height = static_cast<double>(box.height - 2 * box.line_width);
 
 	// Float converter
 	auto randf = [&]() {
-		return static_cast<float>(dist_real(gen));
+		return static_cast<double>(dist_real(gen));
 	};
 
 	std::vector<FreeBody> free_bodies;
 	for (long i = 0; i < num_free_bodies; i++) {
 
-		float speed{ static_cast<float>(randf()) * config.max_velocity };
-		float angle{ static_cast<float>(randf()) * 2 * PI };
+		double speed{ static_cast<double>(randf()) * config.max_velocity };
+		double angle{ static_cast<double>(randf()) * 2 * PI };
 
 		free_bodies.emplace_back(
 			dist_real(gen) * (config.max_mass - config.min_mass) + config.min_mass, // Mass
