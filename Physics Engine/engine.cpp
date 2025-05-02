@@ -61,7 +61,7 @@ void updateFreeBodies(std::vector<FreeBody>& free_bodies, Box& box, double& accu
 	{
 		for (FreeBody& ball : free_bodies)
 		{
-			//ball.applyForce(ball.mass * Config::GRAVITY);
+			ball.applyForce(ball.mass * Config::GRAVITY);
 			ball.update(Config::DELTA_TIME);
 			handleBoxCollison(box, ball);
 		}
