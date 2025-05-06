@@ -8,6 +8,14 @@
 
 // Creates a box on screen with specified width, height, position and line_width
 Box createBox();
+// Creates the grid
+Grid createGrid();
+sf::RectangleShape createGround();
+constexpr CollisionBoundary getGroundBoundary() {
+		return CollisionBoundary{ FLT_MAX, FLT_MAX, FLT_MAX, Config::ABOVE_GROUND_HEIGHT };
+	};
+// Updates view
+void updateView(sf::View& view);
 // Generates a specified number of free bodies with random positions and velocities
 std::vector<FreeBody> generate_random_free_bodies(long num_free_bodies, Box& box, const FreeBodyConfig& config);
 

@@ -12,6 +12,45 @@ Box createBox()
 	return box;
 }
 
+Grid createGrid()
+{
+	Grid grid(
+		Config::WORLD_WIDTH,
+		Config::WORLD_HEIGHT,
+		Config::METERS_TO_PIXELS,
+		Config::MAX_DISTANCE,
+		Config::GROUND_HEIGHT + Config::GROUND_WIDTH,
+		Config::GRID_CENTERLINE_WIDTH
+	);
+	grid.setColor(Config::LIGHT_GRAY);
+	grid.setCenterlineColor(Config::LIGHTER_GRAY);
+	return grid;
+}
+
+sf::RectangleShape createGround()
+{
+	sf::RectangleShape ground({ Config::MAX_DISTANCE.x * 2, Config::GROUND_HEIGHT });
+	ground.setPosition(Config::GROUND_POS);
+	ground.setFillColor(Config::GRAY);
+	ground.setOutlineColor(Config::WHITE);
+	ground.setOutlineThickness(Config::GROUND_WIDTH);
+	return ground;
+}
+
+void updateView(sf::View& screen)
+{
+	float viewX{};
+	float viewY{};
+	// Move view with arrow keys
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)) viewX += 5;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))  viewX -= 5;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))    viewY -= 5;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && screen.getCenter().y < Config::BOTTOM_CENTER.y) 
+		viewY += 5;
+
+	screen.move({ viewX, viewY }); // View centered around (viewX, viewY)
+}
+
 std::vector<FreeBody> generate_random_free_bodies(long num_free_bodies, Box& box, const FreeBodyConfig& config)
 {
 	static constexpr double PI{ 3.14159 };
