@@ -1,42 +1,110 @@
-#include "graphics.h"
+﻿#include "graphics.h"
 
 // Grid
-Grid::Grid(float width, float height, float spacing, float y_start)
+Grid::Grid(float width, float height, float spacing, sf::Vector2f max_distance, float y_start, float center_line_width)
 	: width(width), 
 	  height(height), 
-	  spacing(spacing), 
+	  spacing(spacing),
+	  max_distance(max_distance),
 	  y_start(y_start),
 	  lines(sf::PrimitiveType::Lines),
-	  centerLine{}
+	  center_line{}, left_line{}, right_line{}, top_line{}, bottom_line{},
+	  num_lines_x{}, num_lines_y{}
 {
 	float center_x{ width / 2 };
 	
 	for (float offset = -std::floor(center_x / spacing); offset < std::floor(center_x / spacing); offset += 1)
 	{
-		if (offset == 0) continue;
 		float pos_x{ center_x + offset * spacing };
-		lines.append(sf::Vertex{ {pos_x, 0} });
-		lines.append(sf::Vertex{ {pos_x, height} });
+		lines.append(sf::Vertex{ {pos_x, (height - y_start)} });
+		lines.append(sf::Vertex{ {pos_x, (height - y_start) - max_distance.y} });
+		num_lines_x++;
 	}
+	right_line = num_lines_x - 1;
 
-	for (float offset = 1; offset <= std::floor((height - y_start) / spacing); offset += 1)
+	for (float offset = -std::floor(y_start / spacing); offset <= std::floor((height - y_start) / spacing); offset += 1)
 	{
 		float pos_y{ (height - y_start) - offset * spacing};
-		lines.append(sf::Vertex{ {0, pos_y} });
-		lines.append(sf::Vertex{ {width, pos_y} });
+		lines.append(sf::Vertex{ {-max_distance.x + center_x, pos_y} });
+		lines.append(sf::Vertex{ {max_distance.x + center_x, pos_y} });
+		num_lines_y++;
 	}
+	top_line = num_lines_y - 1;
 
-	centerLine.setSize(sf::Vector2f(10.0f, (height - y_start)));
-	centerLine.setOrigin(sf::Vector2f(5.0f, 0.f));
-	centerLine.setPosition(sf::Vector2f(center_x, 0.0f));
+	center_line.setSize(sf::Vector2f(center_line_width, max_distance.y));
+	center_line.setOrigin(sf::Vector2f(center_line_width / 2, 0.0f));
+	center_line.setPosition(sf::Vector2f(center_x, (height - y_start) - max_distance.y));
 }
 
 void Grid::setColor(sf::Color color)
 {
-	for (int i = 0; i < lines.getVertexCount(); i++) 
+	for (size_t i = 0; i < lines.getVertexCount(); i++) 
 	{ 
 		lines[i].color = color;
-		centerLine.setFillColor(color);
+		center_line.setFillColor(color);
+	}
+}
+
+void Grid::updateGridLines(sf::View& screen, sf::Vector2f center, sf::Vector2f world_size)
+{
+	enum Direction { LEFT, RIGHT, TOP, BOTTOM };
+	sf::Vector2f offset = screen.getCenter() - center;
+
+	auto getIndex = [&](int idx, Direction dir) -> int {
+		switch (dir) {
+		case Direction::LEFT:
+		case Direction::RIGHT:
+			return idx * 2;
+		case Direction::BOTTOM:
+		default:
+			return (idx + num_lines_x) * 2;
+		}
+		};
+
+	// Moves a line’s vertices horizontally by a given amount
+	auto shiftLineHorizontally = [&](int idx, Direction dir) {
+		int shift{ (dir == LEFT)? 1 : -1 };
+		lines[idx].position.x += shift * world_size.x;
+		lines[idx + 1].position.x += shift * world_size.x;
+		left_line = (left_line + shift + num_lines_x) % num_lines_x;
+		right_line = (right_line + shift + num_lines_x) % num_lines_x;
+		};
+
+	// Moves a line’s vertices vertically by a given amount
+	auto shiftLineVertically = [&](int idx, Direction dir) {
+		int shift{ (dir == TOP) ? 1 : -1 };
+		lines[idx].position.y += shift * world_size.y;
+		lines[idx + 1].position.y += shift * world_size.y;
+		bottom_line = (bottom_line - shift + num_lines_y) % num_lines_y;
+		top_line = (top_line - shift + num_lines_y) % num_lines_y;
+		};
+
+	// LEFT → move lines forward until they're right of the screen center
+	int left_idx{ getIndex(left_line, LEFT) };
+	while (lines[left_idx].position.x < offset.x) {
+		shiftLineHorizontally(left_idx, LEFT);
+		left_idx = getIndex(left_line, LEFT);
+	}
+
+	// RIGHT → move lines backward until they're left of the screen center
+	int right_idx = getIndex(right_line, RIGHT);
+	while (lines[right_idx].position.x > (offset.x + world_size.x)) {
+		shiftLineHorizontally(right_idx, RIGHT);
+		right_idx = getIndex(right_line, RIGHT);
+	}
+
+	// RIGHT → move lines backward until they're left of the screen center
+	int top_idx = getIndex(top_line, TOP);
+	while (lines[top_idx].position.y < offset.y) {
+		shiftLineVertically(top_idx, TOP);
+		top_idx = getIndex(top_line, TOP);
+	}
+
+	// LEFT → move lines forward until they're right of the screen center
+	int bottom_idx{ getIndex(bottom_line, BOTTOM) };
+	while (lines[bottom_idx].position.y > (offset.y + world_size.y)) {
+		shiftLineVertically(bottom_idx, BOTTOM);
+		bottom_idx = getIndex(bottom_line, BOTTOM);
 	}
 }
 
