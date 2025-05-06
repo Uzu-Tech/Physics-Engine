@@ -14,19 +14,14 @@ int main()
     window.setVerticalSyncEnabled(true);
     sf::Font font(Config::FONT_FILE);
 
-    sf::RectangleShape ground(sf::Vector2f(Config::SCREEN_WIDTH, Config::GROUND_HEIGHT * Config::SCREEN_HEIGHT));
-    ground.setPosition(Config::GROUND_POS);
-    ground.setFillColor(Config::GRAY);
-    ground.setOutlineColor(Config::WHITE);
-    ground.setOutlineThickness(Config::GROUND_WIDTH);
+    sf::RectangleShape ground{ createGround() };
+    constexpr CollisionBoundary ground_boundary{ getGroundBoundary() };
+    Grid grid{ createGrid() };
 
-    Grid grid(
-        Config::SCREEN_WIDTH, 
-        Config::SCREEN_HEIGHT,
-        100.0f, 
-        (Config::SCREEN_HEIGHT - Config::GROUND_POS.y) + Config::GROUND_WIDTH
+    sf::View screen(
+        { Config::BOTTOM_CENTER.x, Config::BOTTOM_CENTER.y }, 
+        { Config::SCREEN_WIDTH, Config::SCREEN_HEIGHT }
     );
-    grid.setColor(Config::LIGHT_GRAY);
 
     // Timing variables
     sf::Clock clock;
@@ -41,11 +36,15 @@ int main()
             }
         }
 
+        updateView(screen);
+        grid.updateGridLines(screen, Config::BOTTOM_CENTER, { Config::WORLD_WIDTH, Config::WORLD_HEIGHT });
+
         // Update based on discrete time step in seconds
         double elaspedTime{ static_cast<double>(clock.restart().asSeconds()) };
         accumulator += elaspedTime;
 
         window.clear(Config::BG_COLOR);
+        window.setView(screen);
         window.draw(grid);
         window.draw(ground);
         window.display();
