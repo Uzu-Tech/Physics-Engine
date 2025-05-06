@@ -5,18 +5,22 @@
 
 namespace Config {
 	// Grpahics
-
 	inline constexpr int SCREEN_HEIGHT{ 1800 };
 	inline constexpr int SCREEN_WIDTH{ 3200 };
-	inline constexpr sf::Vector2f CENTER(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	inline constexpr int VIEWPORT_SCALE_X{ 3 };
+	inline constexpr int VIEWPORT_SCALE_Y{ 2 };
+
+	// Grid
+	inline constexpr float METERS_TO_PIXELS{ 100.0f };
+	inline constexpr sf::Vector2f GRID_MAX_KM( 100.0f, 20.0f ); // Past 20km the gravitional field strength stops being constant
+	inline constexpr float GRID_CENTERLINE_WIDTH{ 10.0f };
 
 	// The space between the edge of the window and the sides of the box
 	inline constexpr int BOX_BUFFER{ 200 };
 	inline constexpr int BOX_LINE_WIDTH{ 30 };
 
 	// Ground Settings
-	inline constexpr float GROUND_HEIGHT{ 0.16 };
-	inline constexpr sf::Vector2f GROUND_POS(0.0f, static_cast<float>(SCREEN_HEIGHT) * (1 - GROUND_HEIGHT));
+	inline constexpr float GROUND_HEIGHT_SCALE{ 0.16f };
 	inline constexpr int GROUND_WIDTH{ 10 };
 
 	// Fixed time step between update calls
@@ -27,6 +31,7 @@ namespace Config {
 	inline constexpr sf::Color ACCENT_COLOR(249, 237, 105);
 	inline constexpr sf::Color GRAY(57, 62, 70);
 	inline constexpr sf::Color LIGHT_GRAY(96, 104, 117);
+	inline constexpr sf::Color LIGHTER_GRAY(148, 156, 168);
 
 	// Free Body Properties
 
@@ -41,6 +46,21 @@ namespace Config {
 	inline constexpr int TEXT_DECIMAL_PLACES{ 3 };
 	// Text displayed before showing the energy value e.g. "Total Energy: "
 	const std::string KE_TEXT{ "Energy Loss J/s: " };
+
+	// Calculated Values
+	inline constexpr int WORLD_HEIGHT{ SCREEN_HEIGHT * VIEWPORT_SCALE_Y };
+	inline constexpr int WORLD_WIDTH{ SCREEN_WIDTH * VIEWPORT_SCALE_X };
+	inline constexpr sf::Vector2f WORLD_CENTER(static_cast<float>(WORLD_WIDTH) / 2, static_cast<float>(WORLD_HEIGHT) / 2);
+	inline constexpr sf::Vector2f BOTTOM_CENTER(WORLD_CENTER.x, WORLD_HEIGHT - static_cast<float>(SCREEN_HEIGHT) / 2);
+
+	inline constexpr sf::Vector2f MAX_DISTANCE(
+		GRID_MAX_KM.x * METERS_TO_PIXELS * 1'000, GRID_MAX_KM.y * METERS_TO_PIXELS * 1'000
+	);
+
+	inline constexpr float GROUND_HEIGHT{ GROUND_HEIGHT_SCALE * SCREEN_HEIGHT };
+	inline constexpr sf::Vector2f GROUND_POS(-MAX_DISTANCE.x, static_cast<float>(WORLD_HEIGHT) - GROUND_HEIGHT);
+	inline constexpr float ABOVE_GROUND_HEIGHT{ static_cast<float>(WORLD_HEIGHT) - GROUND_HEIGHT };
+
 }
 
 // Structs for function arguments
