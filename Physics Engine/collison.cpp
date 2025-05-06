@@ -1,23 +1,17 @@
 #include "collison.h"
 
-void handleBoxCollison(Box& box, FreeBody& free_body)
+void handleRigidCollison(CollisionBoundary& boundary, FreeBody& free_body)
 {
-	// Get the positions of the floor, ceiling and sides of the box from the box coordinates
-	float collison_ceiling{ box.pos.y + box.line_width + free_body.getRadius() };
-	float collison_floor{ box.pos.y - box.line_width + box.height - free_body.getRadius() };
-	float collison_left{ box.pos.x + box.line_width + free_body.getRadius() };
-	float collison_right{ box.pos.x - box.line_width + box.width - free_body.getRadius() };
-
 	// Resolve ceiling or floor collison
-	if (free_body.position.y <= collison_ceiling || free_body.position.y >= collison_floor) {
+	if (free_body.position.y <= boundary.ceiling || free_body.position.y >= boundary.floor) {
 		free_body.velocity.y = -free_body.velocity.y * std::sqrt(free_body.restitution);
-		free_body.position.y = (free_body.position.y <= collison_ceiling) ? collison_ceiling : collison_floor;
+		free_body.position.y = (free_body.position.y <= boundary.ceiling) ? boundary.ceiling : boundary.floor;
 	}
 	
 	// Resolve side collison
-	if (free_body.position.x <= collison_left || free_body.position.x >= collison_right) {
+	if (free_body.position.x <= boundary.left || free_body.position.x >= boundary.right) {
 		free_body.velocity.x = -free_body.velocity.x * std::sqrt(free_body.restitution);
-		free_body.position.x = (free_body.position.x <= collison_left) ? collison_left : collison_right;
+		free_body.position.x = (free_body.position.x <= boundary.left) ? boundary.left : boundary.right;
 	}
 }
 
